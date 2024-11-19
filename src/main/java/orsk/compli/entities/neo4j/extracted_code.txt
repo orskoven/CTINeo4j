@@ -1,0 +1,780 @@
+package orsk.example.entities;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.index.Indexed;
+import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.time.LocalDateTime;
+
+@Data
+@Document(collection = "affected_products")
+public class AffectedProduct {
+
+    @Id
+    private ObjectId id;
+
+    @NotBlank @Size(max = 100)
+    @Indexed
+    private String name;
+
+    @NotBlank @Size(max = 100)
+    private String vendor;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+}
+
+package orsk.example.entities;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.index.Indexed;
+import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.time.LocalDateTime;
+
+@Data
+@Document(collection = "countries")
+public class Country {
+
+    @Id
+    private ObjectId id;
+
+    @NotBlank @Size(min = 2, max = 3)
+    @Indexed(unique = true)
+    private String code;
+
+    @NotBlank @Size(max = 100)
+    private String name;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+}
+
+package orsk.example.entities;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import lombok.Getter;
+import lombok.Setter;
+import orsk.example.entities.User;
+
+import java.time.Instant;
+
+@Getter
+@Setter
+@Document(collection = "refresh_tokens")
+public class RefreshToken {
+
+    @Id
+    private String id;
+
+    private String token;
+
+    private Instant expiryDate;
+
+    @DBRef
+    private User user;
+}package orsk.example.entities;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Data
+@Document(collection = "attack_patterns")
+public class AttackPattern {
+
+    @Id
+    private ObjectId id;
+
+    @NotBlank
+    @Pattern(regexp = "ATP-\\d{6}", message = "Invalid Attack Pattern ID format")
+    @Indexed(unique = true)
+    private String patternId;
+
+    @NotBlank @Size(max = 150)
+    private String name;
+
+    @Size(max = 2000)
+    private String description;
+
+    @Size(max = 50)
+    private String techniqueId;
+
+    @DBRef
+    private List<TTP> relatedTTPs;
+
+    @DBRef
+    private List<Malware> associatedMalwares;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+}
+
+package orsk.example.entities;
+
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.Instant;
+@NoArgsConstructor
+@Getter
+@Setter
+@Document(collection = "password_reset_tokens")
+public class PasswordResetToken {
+
+    @Id
+    private String id;
+
+    private String token;
+
+    private Instant expiryDate;
+
+    private boolean used;
+
+    @DBRef
+    private User user;
+
+    public PasswordResetToken(String token, Instant expiryDate, User user) {
+        this.token = token;
+        this.expiryDate = expiryDate;
+        this.user = user;
+        this.used = false;
+    }
+
+
+}package orsk.example.entities;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import jakarta.validation.constraints.*;
+
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.index.Indexed;
+import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Data
+@Document(collection = "global_threats")
+public class GlobalThreat {
+
+    @Id
+    private ObjectId id;
+
+    @NotBlank @Size(max = 150)
+    @Indexed
+    private String name;
+
+    @Size(max = 1000)
+    private String description;
+
+    private LocalDate firstDetected;
+
+    @Min(1) @Max(10)
+    private int severityLevel;
+
+    private LocalDate dataRetentionUntil;
+
+    private List<Vulnerability> vulnerabilities;
+
+    private List<AttackVector> attackVectors;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+}
+
+package orsk.example.entities;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@Document(collection = "privileges")
+public class Privilege {
+    @Id
+    private String id;
+
+    @Indexed(unique = true)
+    private String name;
+}
+package orsk.example.entities;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Data
+@Document(collection = "indicators")
+public class Indicator {
+
+    @Id
+    private ObjectId id;
+
+    @NotBlank @Pattern(regexp = "IND-\\d{6}", message = "Invalid Indicator ID format")
+    @Indexed(unique = true)
+    private String indicatorId;
+
+    @NotBlank @Size(max = 50)
+    private String type;
+
+    @NotBlank @Size(max = 500)
+    private String value;
+
+    @Size(max = 1000)
+    private String description;
+
+    private LocalDateTime firstSeen;
+
+    private LocalDateTime lastSeen;
+
+    @DBRef
+    private List<Incident> relatedIncidents;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+}
+
+package orsk.example.entities;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Data
+@Document(collection = "threat_groups")
+public class ThreatGroup {
+
+    @Id
+    private ObjectId id;
+
+    @NotBlank @Pattern(regexp = "GRP-\\d{6}", message = "Invalid Group ID format")
+    @Indexed(unique = true)
+    private String groupId;
+
+    @NotBlank @Size(max = 150)
+    private String name;
+
+    @Size(max = 2000)
+    private String description;
+
+    @Size(max = 10)
+    private List<String> knownAliases;
+
+    @DBRef
+    private List<ThreatActor> associatedThreatActors;
+
+    @DBRef
+    private List<Campaign> campaigns;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+}
+
+package orsk.example.entities;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Data
+@Document(collection = "ttps")
+public class TTP {
+
+    @Id
+    private ObjectId id;
+
+    @NotBlank @Pattern(regexp = "TTP-\\d{6}", message = "Invalid TTP ID format")
+    @Indexed(unique = true)
+    private String ttpId;
+
+    @NotBlank @Size(max = 100)
+    private String tactic;
+
+    @NotBlank @Size(max = 150)
+    private String technique;
+
+    @Size(max = 2000)
+    private String description;
+
+    @DBRef
+    private List<AttackPattern> relatedAttackPatterns;
+
+    @DBRef
+    private List<Malware> associatedMalwares;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+}
+
+package orsk.example.entities;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.Set;
+
+@Getter
+@Setter
+@Document(collection = "users") // Specify MongoDB collection name
+public class User {
+    @Id
+    private String id; // Aligns with MongoDB's ObjectId
+
+    @Indexed(unique = true) // Enhances query performance
+    private String username;
+
+    private String password;
+
+    @Indexed(unique = true)
+    private String email;
+
+    private Boolean enabled = false;
+
+    private Boolean consentToDataUsage = false;
+
+    @DBRef // Reference to Role documents
+    private Set<Role> roles;
+}
+package orsk.example.entities;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import lombok.Getter;
+import lombok.Setter;
+import orsk.example.entities.User;
+
+import java.time.Instant;
+
+@Getter
+@Setter
+@Document(collection = "verification_tokens")
+public class VerificationToken {
+
+    @Id
+    private String id;
+
+    private String token;
+
+    @DBRef
+    private User user;
+
+    private Instant expiryDate;
+}package orsk.example.entities;
+
+import jakarta.validation.constraints.*;
+import org.springframework.data.mongodb.core.index.Indexed;
+import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Data
+public class AttackVector {
+
+    @NotBlank @Size(max = 150)
+    @Indexed
+    private String name;
+
+    @Min(1) @Max(10)
+    private int severityLevel;
+
+    @Size(max = 500)
+    private String description;
+
+}
+
+package orsk.example.entities;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Data
+@Document(collection = "malwares")
+public class Malware {
+
+    @Id
+    private ObjectId id;
+
+    @NotBlank
+    @Pattern(regexp = "MAL-\\d{6}", message = "Invalid Malware ID format")
+    @Indexed(unique = true)
+    private String malwareId;
+
+    @NotBlank @Size(max = 150)
+    private String name;
+
+    @NotBlank @Size(max = 100)
+    private String type;
+
+    @Size(max = 2000)
+    private String description;
+
+    private LocalDateTime firstSeen;
+
+    private LocalDateTime lastSeen;
+
+    @DBRef
+    private List<ThreatActor> associatedThreatActors;
+
+    @DBRef
+    private List<AttackPattern> attackPatterns;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+}
+
+package orsk.example.entities;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Data
+@Document(collection = "threat_actors")
+public class ThreatActor {
+
+    @Id
+    private ObjectId id;
+
+    @NotBlank @Size(max = 150)
+    @Indexed
+    private String name;
+
+    @DBRef(lazy = true)
+    private Country originCountry;
+
+    private Geolocation geolocation;
+
+    private LocalDate firstObserved;
+
+    @DBRef(lazy = true)
+    private List<ThreatGroup> associatedGroups;
+
+    @Size(max = 50)
+    private String operationalStatus;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+}
+
+package orsk.example.entities;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.Set;
+
+@Getter
+@Setter
+@Document(collection = "roles")
+public class Role {
+    @Id
+    private String id;
+
+    @Indexed(unique = true) // Enhances query performance
+    private String name;
+
+    @DBRef // Reference to Privilege documents
+    private Set<Privilege> privileges;
+}
+package orsk.example.entities;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Data
+@Document(collection = "incidents")
+public class Incident {
+
+    @Id
+    private ObjectId id;
+
+    @NotBlank @Pattern(regexp = "INC-\\d{6}", message = "Invalid Incident ID format")
+    @Indexed(unique = true)
+    private String incidentId;
+
+    @NotBlank @Size(max = 200)
+    private String title;
+
+    @Size(max = 2000)
+    private String description;
+
+    @NotNull
+    private LocalDateTime reportedAt;
+
+    @NotBlank @Size(max = 50)
+    private String status;
+
+    @DBRef
+    private List<ThreatActor> threatActors;
+
+    @DBRef
+    private List<AffectedProduct> affectedProducts;
+
+    private Geolocation geolocation;
+
+    @DBRef
+    private List<Malware> malwareUsed;
+
+    @DBRef
+    private List<Indicator> indicators;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+}
+
+package orsk.example.entities;
+
+import java.time.LocalDate;
+
+import jakarta.validation.constraints.*;
+import org.springframework.data.mongodb.core.index.Indexed;
+import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Data
+public class Vulnerability {
+
+    @NotBlank @Pattern(regexp = "CVE-\\d{4}-\\d{4,7}", message = "Invalid CVE format")
+    @Indexed(unique = true)
+    private String cveId;
+
+    @Size(max = 1000)
+    private String description;
+
+    private LocalDate publishedDate;
+
+    @Min(0) @Max(10)
+    private double severityScore;
+
+    @Min(0) @Max(10)
+    private double cvssScore;
+
+}
+
+package orsk.example.entities;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Data
+@Document(collection = "reports")
+public class Report {
+
+    @Id
+    private ObjectId id;
+
+    @NotBlank @Pattern(regexp = "RPT-\\d{6}", message = "Invalid Report ID format")
+    @Indexed(unique = true)
+    private String reportId;
+
+    @NotBlank @Size(max = 200)
+    private String title;
+
+    @NotBlank
+    private String content;
+
+    @NotNull
+    private LocalDateTime publishedAt;
+
+    @Size(max = 100)
+    private String author;
+
+    @DBRef
+    private List<Incident> relatedIncidents;
+
+    @DBRef
+    private List<ThreatActor> relatedThreatActors;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+}
+
+package orsk.example.entities;
+
+import jakarta.validation.constraints.*;
+import org.springframework.data.mongodb.core.index.Indexed;
+import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Data
+public class Geolocation {
+
+    @NotBlank @Pattern(regexp = "^((25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)(\\.|$)){4}$", message = "Invalid IP address format")
+    @Indexed
+    private String ipAddress;
+
+    @Size(max = 100)
+    private String region;
+
+    @Size(max = 100)
+    private String city;
+
+    @DecimalMin("-90.0") @DecimalMax("90.0")
+    private double latitude;
+
+    @DecimalMin("-180.0") @DecimalMax("180.0")
+    private double longitude;
+
+}
+
+package orsk.example.entities;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Data
+@Document(collection = "campaigns")
+public class Campaign {
+
+    @Id
+    private ObjectId id;
+
+    @NotBlank @Pattern(regexp = "CMP-\\d{6}", message = "Invalid Campaign ID format")
+    @Indexed(unique = true)
+    private String campaignId;
+
+    @NotBlank @Size(max = 200)
+    private String name;
+
+    @Size(max = 2000)
+    private String description;
+
+    private LocalDate startDate;
+
+    private LocalDate endDate;
+
+    @DBRef
+    private List<ThreatActor> threatActors;
+
+    @DBRef
+    private List<Incident> incidents;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+}
+
